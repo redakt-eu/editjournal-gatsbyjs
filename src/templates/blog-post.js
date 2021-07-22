@@ -26,6 +26,12 @@ const BlogPostTemplate = ({ data: { previous, next, post } }) => {
 
           <p>{post.date}</p>
 
+          <p class="tags">{post.tags.nodes.map(tag => {
+              return (
+                  <span>{tag.name}</span>
+              )
+          })}</p>
+
           {/* if we have a featured image for this post let's display it */}
           {featuredImage?.fluid && (
             <Image
@@ -90,6 +96,12 @@ export const pageQuery = graphql`
       content
       title
       date(formatString: "MMMM DD, YYYY")
+      tags {
+        nodes {
+          name
+          slug
+        }
+      }
 
       featuredImage {
         node {

@@ -311,6 +311,20 @@ a:focus {
 .blog-post header p {
   font-size: var(--fontSize-2);
   font-family: var(--font-heading);
+  margin-bottom: var(--spacing-4);
+}
+
+.blog-post header p.tags span {
+    background-color: var(--color-primary);
+    border-radius: 5px;
+    color: var(--color-accent);
+    display: inline-block;
+    font-size: smaller;
+    padding: 5px;
+}
+
+.blog-post section {
+  margin-top: var(--spacing-8);
 }
 
 .blog-post-nav ul {
