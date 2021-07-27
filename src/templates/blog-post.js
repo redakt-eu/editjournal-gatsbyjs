@@ -6,6 +6,17 @@ import parse from "html-react-parser"
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 
+var md = require('markdown-it')({
+    breaks: process.env.MARKDOWNIT_BREAKS
+        ? process.env.MARKDOWNIT_BREAKS.toLowerCase() === 'true' : true,
+    html: process.env.MARKDOWNIT_HTML
+        ? process.env.MARKDOWNIT_HTML.toLowerCase() === 'true' : true,
+    linkify: process.env.MARKDOWNIT_LINKIFY
+        ? process.env.MARKDOWNIT_LINKIFY.toLowerCase() === 'true' : true,
+    typographer: process.env.MARKDOWNIT_TYPOGRAPHER
+        ? process.env.MARKDOWNIT_TYPOGRAPHER.toLowerCase() === 'true' : true
+});
+
 const BlogPostTemplate = ({ data: { previous, next, post } }) => {
   const featuredImage = {
     fluid: post.featuredImage?.node?.localFile?.childImageSharp?.fluid,
@@ -44,9 +55,8 @@ const BlogPostTemplate = ({ data: { previous, next, post } }) => {
         </header>
 
         {!!post.content && (
-          <section itemProp="articleBody">{parse(post.content)}</section>
+          <section itemProp="articleBody">{parse(md.render(post.content))}</section>
         )}
-
         <hr />
       </article>
 
