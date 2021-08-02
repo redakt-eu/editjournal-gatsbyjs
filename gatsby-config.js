@@ -36,6 +36,18 @@ module.exports = {
       },
     },
 
+    {
+        resolve: `gatsby-plugin-matomo`,
+        options: {
+            dev: true,
+            siteId: process.env.MATOMO_siteId,
+            matomoUrl: process.env.MATOMO_matomoUrl,
+            siteUrl: process.env.MATOMO_siteUrl,
+            matomoPhpScript: `matomo.php`,
+            matomoJsScript: `matomo.js`
+        }
+    },
+
     /**
      * We need this plugin so that it adds the "File.publicURL" to our site
      * It will allow us to access static url's for assets like PDF's
