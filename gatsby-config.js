@@ -11,6 +11,9 @@ require('dotenv').config({
 });
 
 module.exports = {
+  siteMetadata: {
+    siteUrl: process.env.siteMetadata_siteUrl,
+  },
   /**
    * Adding plugins to this array adds them to your Gatsby site.
    *
@@ -42,7 +45,7 @@ module.exports = {
             dev: true,
             siteId: process.env.MATOMO_siteId,
             matomoUrl: process.env.MATOMO_matomoUrl,
-            siteUrl: process.env.MATOMO_siteUrl,
+            siteUrl: process.env.siteMetadata_siteUrl,
             matomoPhpScript: `matomo.php`,
             matomoJsScript: `matomo.js`
         }
