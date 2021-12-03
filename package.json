@@ -8,6 +8,7 @@
     "url": "https://github.com/gatsbyjs/gatsby/issues"
   },
   "dependencies": {
+    "acorn": "^8.6.0",
     "gatsby": "^3.3.0",
     "gatsby-image": "^3.3.0",
     "gatsby-plugin-manifest": "^3.3.0",
@@ -23,8 +24,8 @@
     "lodash": "^4.17.20",
     "markdown-it": "^12.1.0",
     "postcss": "^8.2.10",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "react-helmet": "^5.2.1",
     "typeface-merriweather": "1.1.13",
     "typeface-montserrat": "1.1.13"
