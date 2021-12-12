@@ -10,7 +10,7 @@ const BlogIndex = ({
   data,
   pageContext: { nextPagePath, previousPagePath },
 }) => {
-  const posts = data.allWpPost.nodes
+  const posts = data.allWpPost.nodes;
 
   if (!posts.length) {
     return (
@@ -33,7 +33,7 @@ const BlogIndex = ({
 
       <ol style={{ listStyle: `none` }}>
         {posts.map(post => {
-          const title = post.title
+          const title = post.title;
 
           return (
             <li key={post.uri}>
@@ -49,6 +49,11 @@ const BlogIndex = ({
                     </Link>
                   </h2>
                   <small>{post.date}</small>
+                  <p class="tags">{post.tags.nodes.map(tag => {
+                    return (
+                      <span>{tag.name}</span>
+                    )
+                  })}</p>
                 </header>
                 <section itemProp="description">{parse(post.excerpt)}</section>
               </article>
@@ -83,6 +88,14 @@ export const pageQuery = graphql`
         date(formatString: "MMMM DD, YYYY")
         title
         excerpt
+        tags {
+          nodes {
+            id
+            name
+            slug
+            uri
+          }
+        }
       }
     }
   }
