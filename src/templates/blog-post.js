@@ -39,7 +39,7 @@ const BlogPostTemplate = ({ data: { previous, next, post } }) => {
 
           <p>{post.date}</p>
 
-          <p class="tags">{post.tags.nodes.map(tag => {
+          <p className="tags">{post.tags.nodes.map(tag => {
               return (
                   <span>{tag.name}</span>
               )

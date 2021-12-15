@@ -1,5 +1,5 @@
-const path = require(`path`)
-const chunk = require(`lodash/chunk`)
+const path = require(`path`);
+const chunk = require(`lodash/chunk`);
 
 // This is a simple debugging tool
 // dd() will prettily dump to the terminal and kill the process
@@ -13,18 +13,23 @@ const chunk = require(`lodash/chunk`)
  */
 exports.createPages = async gatsbyUtilities => {
   // Query our posts from the GraphQL server
-  const posts = await getPosts(gatsbyUtilities)
+  const posts = await getPosts(gatsbyUtilities);
+  // Query our tags from the GraphQL server
+  const tags = await getTags(gatsbyUtilities);
 
   // If there are no posts in WordPress, don't do anything
   if (!posts.length) {
-    return
-  }
+    return;
+  };
 
   // If there are posts, create pages for them
-  await createIndividualBlogPostPages({ posts, gatsbyUtilities })
+  await createIndividualBlogPostPages({ posts, gatsbyUtilities });
 
   // And a paginated archive
-  await createBlogPostArchive({ posts, gatsbyUtilities })
+  await createBlogPostArchive({ posts, gatsbyUtilities });
+
+  // Create tag pages with pagination
+  await createTagPostArchive({ tags, gatsbyUtilities });
 }
 
 /**
@@ -57,7 +62,7 @@ const createIndividualBlogPostPages = async ({ posts, gatsbyUtilities }) =>
         },
       })
     )
-  )
+  );
 
 /**
  * This function creates all the individual blog pages in this site
@@ -71,16 +76,16 @@ async function createBlogPostArchive({ posts, gatsbyUtilities }) {
         }
       }
     }
-  `)
+  `);
 
-  const { postsPerPage } = graphqlResult.data.wp.readingSettings
+  const { postsPerPage } = graphqlResult.data.wp.readingSettings;
 
-  const postsChunkedIntoArchivePages = chunk(posts, postsPerPage)
-  const totalPages = postsChunkedIntoArchivePages.length
+  const postsChunkedIntoArchivePages = chunk(posts, postsPerPage);
+  const totalPages = postsChunkedIntoArchivePages.length;
 
   return Promise.all(
     postsChunkedIntoArchivePages.map(async (_posts, index) => {
-      const pageNumber = index + 1
+      const pageNumber = index + 1;
 
       const getPagePath = page => {
         if (page > 0 && page <= totalPages) {
@@ -88,10 +93,10 @@ async function createBlogPostArchive({ posts, gatsbyUtilities }) {
           // we want the first page to be "/" and any additional pages
           // to be numbered.
           // "/blog/2" for example
-          return page === 1 ? `/` : `/blog/${page}`
+          return page === 1 ? `/` : `/blog/${page}`;
         }
 
-        return null
+        return null;
       }
 
       // createPage is an action passed to createPages
@@ -120,6 +125,8 @@ async function createBlogPostArchive({ posts, gatsbyUtilities }) {
     })
   )
 }
+
+
 
 /**
  * This function queries Gatsby's GraphQL server and asks for
@@ -152,15 +159,124 @@ async function getPosts({ graphql, reporter }) {
         }
       }
     }
-  `)
+  `);
 
   if (graphqlResult.errors) {
     reporter.panicOnBuild(
       `There was an error loading your blog posts`,
       graphqlResult.errors
     )
-    return
+    return;
   }
 
-  return graphqlResult.data.allWpPost.edges
+  return graphqlResult.data.allWpPost.edges;
+}
+
+async function getTags({ graphql, reporter }) {
+  const graphqlResult = await graphql(/* GraphQL */ `
+    query WpTags {
+      allWpTag {
+        nodes {
+          name
+          slug
+          uri
+        }
+      }
+    }
+  `);
+
+  if (graphqlResult.errors) {
+    reporter.panicOnBuild(
+      `There was an error loading tags`,
+      graphqlResult.errors
+    )
+    return;
+  }
+
+  return graphqlResult.data.allWpTag.nodes;
+};
+
+/**
+ * This function creates all the individual tag pages in this site
+ */
+ async function createTagPostArchive({ tags, gatsbyUtilities }) {
+  const graphqlResult = await gatsbyUtilities.graphql(/* GraphQL */ `
+    {
+      wp {
+        readingSettings {
+          postsPerPage
+        }
+      }
+    }
+  `);
+
+  const { postsPerPage } = graphqlResult.data.wp.readingSettings;
+
+  // const postsChunkedIntoArchivePages = chunk(posts, postsPerPage);
+  // const totalPages = postsChunkedIntoArchivePages.length;
+
+  return tags.map( async (tag) => {
+    await gatsbyUtilities.actions.createPage({
+      path: `/tag/${tag.slug}`,
+
+      // use the blog post archive template as the page component
+      component: path.resolve(`./src/templates/tags-post-archive.js`),
+
+      // `context` is available in the template as a prop and
+      // as a variable in GraphQL.
+      context: {
+        // the index of our loop is the offset of which posts we want to display
+        // so for page 1, 0 * 10 = 0 offset, for page 2, 1 * 10 = 10 posts offset,
+        // etc
+        // offset: index * postsPerPage,
+
+        // We need to tell the template how many posts to display too
+        postsPerPage,
+
+        tag
+      },
+    })
+  });
+
+  // return Promise.all(
+  //   postsChunkedIntoArchivePages.map(async (_posts, index) => {
+  //     const pageNumber = index + 1;
+
+  //     const getPagePath = page => {
+  //       if (page > 0 && page <= totalPages) {
+  //         // Since our homepage is our blog page
+  //         // we want the first page to be "/" and any additional pages
+  //         // to be numbered.
+  //         // "/blog/2" for example
+  //         return page === 1 ? `/` : `/blog/${page}`;
+  //       }
+
+  //       return null;
+  //     }
+
+  //     // createPage is an action passed to createPages
+  //     // See https://www.gatsbyjs.com/docs/actions#createPage for more info
+  //     await gatsbyUtilities.actions.createPage({
+  //       path: getPagePath(pageNumber),
+
+  //       // use the blog post archive template as the page component
+  //       component: path.resolve(`./src/templates/blog-post-archive.js`),
+
+  //       // `context` is available in the template as a prop and
+  //       // as a variable in GraphQL.
+  //       context: {
+  //         // the index of our loop is the offset of which posts we want to display
+  //         // so for page 1, 0 * 10 = 0 offset, for page 2, 1 * 10 = 10 posts offset,
+  //         // etc
+  //         offset: index * postsPerPage,
+
+  //         // We need to tell the template how many posts to display too
+  //         postsPerPage,
+
+  //         nextPagePath: getPagePath(pageNumber + 1),
+  //         previousPagePath: getPagePath(pageNumber - 1),
+  //       },
+  //     })
+  //   })
+  // )
 }

@@ -49,7 +49,7 @@ const BlogIndex = ({
                     </Link>
                   </h2>
                   <small>{post.date}</small>
-                  <p class="tags">{post.tags.nodes.map(tag => {
+                  <p className="tags">{post.tags.nodes.map(tag => {
                     return (
                       <span>{tag.name}</span>
                     )
