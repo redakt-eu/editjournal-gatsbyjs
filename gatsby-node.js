@@ -215,28 +215,61 @@ async function getTags({ graphql, reporter }) {
   // const postsChunkedIntoArchivePages = chunk(posts, postsPerPage);
   // const totalPages = postsChunkedIntoArchivePages.length;
 
-  return tags.map( async (tag) => {
-    await gatsbyUtilities.actions.createPage({
-      path: `/tag/${tag.slug}`,
+  return Promise.all(
+    tags.map( async (tag) => {
 
-      // use the blog post archive template as the page component
-      component: path.resolve(`./src/templates/tags-post-archive.js`),
+      // Extract slug for matching posts with tag
+      const slug = tag.slug;
 
-      // `context` is available in the template as a prop and
-      // as a variable in GraphQL.
-      context: {
-        // the index of our loop is the offset of which posts we want to display
-        // so for page 1, 0 * 10 = 0 offset, for page 2, 1 * 10 = 10 posts offset,
-        // etc
-        // offset: index * postsPerPage,
+      const tagPosts = await gatsbyUtilities.graphql(/* GraphQL */ `
+        query WPPostsPerTags {
+          allWpPost(filter: {tags: {nodes: {elemMatch: {slug: {eq: "${slug}"}}}}}) {
+            edges {
+              node {
+                id
+                uri
+                title
+                date
+                tags {
+                  nodes {
+                    id
+                    slug
+                    uri
+                    link
+                  }
+                }
+                excerpt
+                slug
+              }
+            }
+          }
+        }
+      `);
+  
+      await gatsbyUtilities.actions.createPage({
+        path: `/tag/${tag.slug}`,
+  
+        // use the blog post archive template as the page component
+        component: path.resolve(`./src/templates/tags-post-archive.js`),
+  
+        // `context` is available in the template as a prop and
+        // as a variable in GraphQL.
+        context: {
+          // the index of our loop is the offset of which posts we want to display
+          // so for page 1, 0 * 10 = 0 offset, for page 2, 1 * 10 = 10 posts offset,
+          // etc
+          // offset: index * postsPerPage,
+  
+          // We need to tell the template how many posts to display too
+          postsPerPage,
+  
+          tag,
 
-        // We need to tell the template how many posts to display too
-        postsPerPage,
-
-        tag
-      },
+          tagPosts: tagPosts
+        },
+      })
     })
-  });
+  );
 
   // return Promise.all(
   //   postsChunkedIntoArchivePages.map(async (_posts, index) => {

@@ -274,6 +274,7 @@ a:focus {
   font-size: var(--fontSize-2);
   font-family: var(--font-heading);
   margin-bottom: var(--spacing-4);
+  margin-left: -brb5px;
 }
 
 .post-list-item p.tags span {
@@ -285,7 +286,11 @@ a:focus {
   padding: 5px;
 }
 
-.post-list-item p.tags span:not(:first-child) { margin-left: 5px; }
+.post-list-item p.tags a {
+  display: inline-block;
+  margin-bottom: 5px;
+  margin-left: 5px;
+}
 
 .post-list-item h2 {
   font-size: var(--fontSize-4);
@@ -330,6 +335,12 @@ a:focus {
   font-size: var(--fontSize-2);
   font-family: var(--font-heading);
   margin-bottom: var(--spacing-4);
+}
+
+.blog-post header p.tags a {
+  display: inline-block;
+  margin-bottom: 5px;
+  margin-left: 5px;
 }
 
 .blog-post header p.tags span {

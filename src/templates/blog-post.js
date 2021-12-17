@@ -40,9 +40,11 @@ const BlogPostTemplate = ({ data: { previous, next, post } }) => {
           <p>{post.date}</p>
 
           <p className="tags">{post.tags.nodes.map(tag => {
-              return (
-                  <span>{tag.name}</span>
-              )
+            return (
+              <Link to={tag.uri} itemProp="url" key={tag.id}>
+                <span>{tag.slug}</span>
+              </Link>
+            )
           })}</p>
 
           {/* if we have a featured image for this post let's display it */}
@@ -110,8 +112,10 @@ export const pageQuery = graphql`
       date(formatString: "MMMM DD, YYYY")
       tags {
         nodes {
-          name
+          id
           slug
+          uri
+          link
         }
       }
 

@@ -1,10 +1,10 @@
-import React from "react"
-import { Link, graphql } from "gatsby"
-import parse from "html-react-parser"
+import React from "react";
+import { Link, graphql } from "gatsby";
+import parse from "html-react-parser";
 
-import Bio from "../components/bio"
-import Layout from "../components/layout"
-import Seo from "../components/seo"
+import Bio from "../components/bio";
+import Layout from "../components/layout";
+import Seo from "../components/seo";
 
 const BlogIndex = ({
   data,
@@ -51,7 +51,9 @@ const BlogIndex = ({
                   <small>{post.date}</small>
                   <p className="tags">{post.tags.nodes.map(tag => {
                     return (
-                      <span>{tag.name}</span>
+                      <Link to={tag.uri} itemProp="url" key={tag.id}>
+                        <span>{tag.slug}</span>
+                      </Link>
                     )
                   })}</p>
                 </header>

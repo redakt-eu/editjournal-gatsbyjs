@@ -1,8 +1,7 @@
 import React from "react";
-import { Link, graphql } from "gatsby";
+import { Link } from "gatsby";
 import parse from "html-react-parser";
 
-import Bio from "../components/bio";
 import Layout from "../components/layout";
 import Seo from "../components/seo";
 
@@ -10,8 +9,10 @@ const TagsIndex = ({
   data,
   pageContext,
 }) => {
-  // const posts = data.allWpPost.nodes;
+  // Extract tag info
   const tag = pageContext.tag;
+  // Extract tag connected posts for displaying in tags archive page
+  const posts = pageContext.tagPosts.data.allWpPost.edges;
 
   return (
     <Layout isHomePage>
@@ -19,36 +20,12 @@ const TagsIndex = ({
 
       <h2>Tag: {tag.name}</h2>
 
-      <ol>
-        <li>
-          <article
-            className="post-list-item"
-            itemScope
-            itemType="http://schema.org/Article"
-          >
-            <header>
-              <h2>
-                <Link to={'/'} itemProp="url">
-                  <span itemProp="headline">Title</span>
-                </Link>
-              </h2>
-              <small>date</small>
-              <p className="tags">
-                <span>tag</span>
-                <span>tag</span>
-              </p>
-            </header>
-            <section itemProp="description">Excerpt ...</section>
-          </article>
-        </li>
-      </ol>
-
-      {/*<ol style={{ listStyle: `none` }}>
+      <ol style={{ listStyle: `none` }}>
         {posts.map(post => {
-          const title = post.title;
+          const title = post.node.title;
 
           return (
-            <li key={post.uri}>
+          <li key={post.node.uri}>
               <article
                 className="post-list-item"
                 itemScope
@@ -56,25 +33,27 @@ const TagsIndex = ({
               >
                 <header>
                   <h2>
-                    <Link to={post.uri} itemProp="url">
+                    <Link to={post.node.uri} itemProp="url">
                       <span itemProp="headline">{parse(title)}</span>
                     </Link>
                   </h2>
-                  <small>{post.date}</small>
-                  <p class="tags">{post.tags.nodes.map(tag => {
+                  <small>{post.node.date}</small>
+                  <p className="tags">{post.node.tags.nodes.map(tag => {
                     return (
-                      <span>{tag.name}</span>
+                      <Link to={tag.uri} itemProp="url" key={tag.id}>
+                        <span>{tag.slug}</span>
+                      </Link>
                     )
                   })}</p>
                 </header>
-                <section itemProp="description">{parse(post.excerpt)}</section>
+                <section itemProp="description">{parse(post.node.excerpt)}</section>
               </article>
             </li>
           )
         })}
       </ol>
 
-      {previousPagePath && (
+      {/*{previousPagePath && (
         <>
           <Link to={previousPagePath}>Previous page</Link>
           <br />
