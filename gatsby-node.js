@@ -209,18 +209,16 @@ async function getTags({ graphql, reporter }) {
       }
     }
   `);
-
+  
+  // Retriving settings for number of items per page from WP
   const { postsPerPage } = graphqlResult.data.wp.readingSettings;
-
-  // const postsChunkedIntoArchivePages = chunk(posts, postsPerPage);
-  // const totalPages = postsChunkedIntoArchivePages.length;
 
   return Promise.all(
     tags.map( async (tag) => {
 
       // Extract slug for matching posts with tag
       const slug = tag.slug;
-
+      // Get posts using this tag
       const tagPosts = await gatsbyUtilities.graphql(/* GraphQL */ `
         query WPPostsPerTags {
           allWpPost(filter: {tags: {nodes: {elemMatch: {slug: {eq: "${slug}"}}}}}) {
@@ -245,71 +243,56 @@ async function getTags({ graphql, reporter }) {
           }
         }
       `);
-  
-      await gatsbyUtilities.actions.createPage({
-        path: `/tag/${tag.slug}`,
-  
-        // use the blog post archive template as the page component
-        component: path.resolve(`./src/templates/tags-post-archive.js`),
-  
-        // `context` is available in the template as a prop and
-        // as a variable in GraphQL.
-        context: {
-          // the index of our loop is the offset of which posts we want to display
-          // so for page 1, 0 * 10 = 0 offset, for page 2, 1 * 10 = 10 posts offset,
-          // etc
-          // offset: index * postsPerPage,
-  
-          // We need to tell the template how many posts to display too
-          postsPerPage,
-  
-          tag,
 
-          tagPosts: tagPosts
-        },
-      })
+      const posts = tagPosts.data.allWpPost.edges;
+
+      // Create chunks of posts that have specific tag used
+      const postsChunkedIntoTagArchivePages = chunk(posts, postsPerPage);
+      // Get total number of tag pages that should be created
+      const totalPages = postsChunkedIntoTagArchivePages.length;
+
+      return Promise.all(
+        postsChunkedIntoTagArchivePages.map( async (_posts, index) => {
+          // Calculate correct page number
+          const pageNumber = index + 1;
+          // map cirrect tag url with pagination
+          const getPagePath = page => {
+            if (page > 0 && page <= totalPages) {
+              return page === 1 ? `/tag/${slug}` : `/tag/${slug}/${page}`;
+            }
+
+            return null;
+          }
+          // Create paginated Tag pages
+          await gatsbyUtilities.actions.createPage({
+            path: getPagePath(pageNumber),
+      
+            // use the blog post archive template as the page component
+            component: path.resolve(`./src/templates/tags-post-archive.js`),
+      
+            // `context` is available in the template as a prop and
+            // as a variable in GraphQL.
+            context: {
+              // the index of our loop is the offset of which posts we want to display
+              // so for page 1, 0 * 10 = 0 offset, for page 2, 1 * 10 = 10 posts offset,
+              // etc
+              offset: index * postsPerPage,
+              // We need to tell the template how many posts to display too
+              postsPerPage,
+              // Tag data passed to tag page
+              tag,
+              // Posts using this tag pased into Tag page
+              tagPosts: _posts,
+              // Link for previous page ( in case of more then on page )
+              previousPagePath: getPagePath(pageNumber - 1),
+              // Link for next page ( in case of more then on page )
+              nextPagePath: getPagePath(pageNumber + 1)
+            },
+          })
+
+        })
+      );
+  
     })
   );
-
-  // return Promise.all(
-  //   postsChunkedIntoArchivePages.map(async (_posts, index) => {
-  //     const pageNumber = index + 1;
-
-  //     const getPagePath = page => {
-  //       if (page > 0 && page <= totalPages) {
-  //         // Since our homepage is our blog page
-  //         // we want the first page to be "/" and any additional pages
-  //         // to be numbered.
-  //         // "/blog/2" for example
-  //         return page === 1 ? `/` : `/blog/${page}`;
-  //       }
-
-  //       return null;
-  //     }
-
-  //     // createPage is an action passed to createPages
-  //     // See https://www.gatsbyjs.com/docs/actions#createPage for more info
-  //     await gatsbyUtilities.actions.createPage({
-  //       path: getPagePath(pageNumber),
-
-  //       // use the blog post archive template as the page component
-  //       component: path.resolve(`./src/templates/blog-post-archive.js`),
-
-  //       // `context` is available in the template as a prop and
-  //       // as a variable in GraphQL.
-  //       context: {
-  //         // the index of our loop is the offset of which posts we want to display
-  //         // so for page 1, 0 * 10 = 0 offset, for page 2, 1 * 10 = 10 posts offset,
-  //         // etc
-  //         offset: index * postsPerPage,
-
-  //         // We need to tell the template how many posts to display too
-  //         postsPerPage,
-
-  //         nextPagePath: getPagePath(pageNumber + 1),
-  //         previousPagePath: getPagePath(pageNumber - 1),
-  //       },
-  //     })
-  //   })
-  // )
 }

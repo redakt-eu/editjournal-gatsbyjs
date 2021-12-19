@@ -12,7 +12,10 @@ const TagsIndex = ({
   // Extract tag info
   const tag = pageContext.tag;
   // Extract tag connected posts for displaying in tags archive page
-  const posts = pageContext.tagPosts.data.allWpPost.edges;
+  const posts = pageContext.tagPosts;
+  // Handling pagination links
+  const nextPagePath = pageContext.nextPagePath;
+  const previousPagePath = pageContext.previousPagePath;
 
   return (
     <Layout isHomePage>
@@ -53,13 +56,13 @@ const TagsIndex = ({
         })}
       </ol>
 
-      {/*{previousPagePath && (
+      {previousPagePath && (
         <>
           <Link to={previousPagePath}>Previous page</Link>
           <br />
         </>
       )}
-      {nextPagePath && <Link to={nextPagePath}>Next page</Link>} */}
+      {nextPagePath && <Link to={nextPagePath}>Next page</Link>}
     </Layout>
   )
 }
