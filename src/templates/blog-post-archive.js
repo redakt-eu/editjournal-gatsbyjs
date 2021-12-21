@@ -1,16 +1,16 @@
-import React from "react"
-import { Link, graphql } from "gatsby"
-import parse from "html-react-parser"
+import React from "react";
+import { Link, graphql } from "gatsby";
+import parse from "html-react-parser";
 
-import Bio from "../components/bio"
-import Layout from "../components/layout"
-import Seo from "../components/seo"
+import Bio from "../components/bio";
+import Layout from "../components/layout";
+import Seo from "../components/seo";
 
 const BlogIndex = ({
   data,
   pageContext: { nextPagePath, previousPagePath },
 }) => {
-  const posts = data.allWpPost.nodes
+  const posts = data.allWpPost.nodes;
 
   if (!posts.length) {
     return (
@@ -33,7 +33,7 @@ const BlogIndex = ({
 
       <ol style={{ listStyle: `none` }}>
         {posts.map(post => {
-          const title = post.title
+          const title = post.title;
 
           return (
             <li key={post.uri}>
@@ -49,6 +49,13 @@ const BlogIndex = ({
                     </Link>
                   </h2>
                   <small>{post.date}</small>
+                  <p className="tags">{post.tags.nodes.map(tag => {
+                    return (
+                      <Link to={tag.uri} itemProp="url" key={tag.id}>
+                        <span>{tag.slug}</span>
+                      </Link>
+                    )
+                  })}</p>
                 </header>
                 <section itemProp="description">{parse(post.excerpt)}</section>
               </article>
@@ -83,6 +90,14 @@ export const pageQuery = graphql`
         date(formatString: "MMMM DD, YYYY")
         title
         excerpt
+        tags {
+          nodes {
+            id
+            name
+            slug
+            uri
+          }
+        }
       }
     }
   }
