@@ -218,6 +218,8 @@ async function getTags({ graphql, reporter }) {
 
       // Extract slug for matching posts with tag
       const slug = tag.slug;
+      // Extract uri for correct site urls
+      const postURI = tag.uri;
       // Get posts using this tag
       const tagPosts = await gatsbyUtilities.graphql(/* GraphQL */ `
         query WPPostsPerTags {
@@ -258,7 +260,7 @@ async function getTags({ graphql, reporter }) {
           // map cirrect tag url with pagination
           const getPagePath = page => {
             if (page > 0 && page <= totalPages) {
-              return page === 1 ? `/tag/${slug}` : `/tag/${slug}/${page}`;
+              return page === 1 ? `${postURI}` : `${postURI}/${page}`;
             }
 
             return null;
