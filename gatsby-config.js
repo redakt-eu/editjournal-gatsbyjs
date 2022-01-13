@@ -98,5 +98,8 @@ module.exports = {
      * To learn more, visit: https://gatsby.dev/offline
      */
     // `gatsby-plugin-offline`,
+
+    // https://www.gatsbyjs.com/docs/how-to/performance/resolving-out-of-memory-issues/#turn-off-source-maps-generation
+    `gatsby-plugin-no-sourcemaps`
   ],
 }
