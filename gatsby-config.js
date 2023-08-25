@@ -39,6 +39,9 @@ module.exports = {
       },
     },
 
+    // This plugin adds support for Gatsby on Netlify
+    `gatsby-plugin-netlify`,
+
     {
         resolve: `gatsby-plugin-matomo`,
         options: {
