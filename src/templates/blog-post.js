@@ -35,7 +35,7 @@ const BlogPostTemplate = ({ data: { previous, next, post } }) => {
       >
         <header>
           <h1 itemProp="headline">{parse(post.title)}</h1>
-          <p>{post.excerpt}</p>
+          <p>{parse(post.excerpt)}</p>
 
           <p>{post.date}</p>
 
