@@ -35,7 +35,10 @@ const BlogPostTemplate = ({ data: { previous, next, post } }) => {
       >
         <header>
           <h1 itemProp="headline">{parse(post.title)}</h1>
-          <p>{parse(post.excerpt)}</p>
+          {/* Do not display excerpt if it's automatically generated */}
+          {post.excerpt.indexOf('Continue reading') == -1 && (
+            <p><b>{parse(post.excerpt)}</b></p>
+          )}
 
           <p>{post.date}</p>
 
